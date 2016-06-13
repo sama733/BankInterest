@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding= "UTF-8" ?> 
+<deposits>
 <deposit>
       <customerNumber> 534900 </customerNumber>
 	  <depositType> ShortTerm </depositType>
@@ -17,3 +18,4 @@
 	  <depositBalance> 545966600000 </depositBalance>
 	  <durationInDays> 1000 </durationInDays>
 </deposit>
+</deposits>
