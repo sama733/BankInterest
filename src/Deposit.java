@@ -5,13 +5,21 @@ public class Deposit {
     private int customerNumber;
     private BigDecimal depositBalance;
     private int durationInDays;
+    private BigDecimal interest;
     private DepositType depositType;
 
+    public BigDecimal getInterest() {
+        return interest;
+
+    }
+
+    public void setInterest(BigDecimal interest) {
+
+        this.interest = interest;
+    }
 
     public int getCustomerNumber() {
-
         return customerNumber;
-
     }
 
     public void setCustomerNumber(int customerNumber) {
@@ -34,19 +42,13 @@ public class Deposit {
         this.durationInDays = durationDays;
     }
 
-    public void setDepositType(DepositType depositType) {
-        this.depositType = depositType;
-    }
-
     public DepositType getDepositType() {
         return depositType;
     }
 
-
-    public BigDecimal payedInterest() {
-        return null;
+    public void setDepositType(DepositType depositType) {
+        this.depositType = depositType;
     }
-
 
 
 }
