@@ -1,6 +1,8 @@
-import java.io.Serializable;
+
+
+
 import java.math.BigDecimal;
-import java.util.List;
+
 
 public class Deposit  implements Comparable<Deposit> {
 
@@ -29,12 +31,17 @@ public class Deposit  implements Comparable<Deposit> {
     }
 
     public BigDecimal getDepositBalance() {
-        if(depositBalance.compareTo(BigDecimal.ZERO)<0)
-            System.out.println("مقدار وارد شده صحیح نمی باشد");
         return depositBalance;
     }
 
     public void setDepositBalance(BigDecimal depositBalance) {
+        try { if(depositBalance.compareTo(BigDecimal.ZERO)<0 )
+
+                throw new Exception("not valid input");
+            } catch (Exception e) {
+                System.out.println(" مقدار موجودی وارد شده صحیح نمی باشد");
+            }
+
         this.depositBalance = depositBalance;
     }
 
@@ -42,8 +49,13 @@ public class Deposit  implements Comparable<Deposit> {
         return durationInDays;
     }
 
-    public void setDurationInDays(int durationDays) {
-        this.durationInDays = durationDays;
+    public void setDurationInDays(int durationInDays) {
+        try { if(durationInDays <= 0)
+                throw new Exception("not valid input");
+            } catch (Exception e) {
+                System.out.println(" تعداد روزهای وارد شده صحیح نمی باشد");
+            }
+        this.durationInDays = durationInDays;
     }
 
     public DepositType getDepositType() {
@@ -51,13 +63,14 @@ public class Deposit  implements Comparable<Deposit> {
     }
 
     public void setDepositType(DepositType depositType) {
+
         this.depositType = depositType;
     }
 
 
     @Override
     public int compareTo(Deposit deposit) {
-        return -1 * this.getInterest().compareTo(deposit.getInterest());
+        return -1* this.getInterest().compareTo(deposit.getInterest());
 
         /*public int compareTo(Deposit deposit) {
         * if(this.getInterest()> deposit.getInterested())

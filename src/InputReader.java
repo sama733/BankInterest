@@ -42,13 +42,11 @@ public class InputReader {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     element = (Element) node;
                     deposit.setCustomerNumber(Integer.parseInt(element.getElementsByTagName("customerNumber").item(0).getTextContent()));
-
                     deposit.setDepositBalance(BigDecimal.valueOf(Long.parseLong(element.getElementsByTagName("depositBalance").item(0).getTextContent())));
-
                     deposit.setDurationInDays(Integer.valueOf(element.getElementsByTagName("durationInDays").item(0).getTextContent()));
                 }
 
-                //reflection code
+                //reflection code -> khandane depositType va sakhtane kelase morede nazar
                 String depositTypeStr = element.getElementsByTagName("depositType").item(0).getTextContent();
                 Class aClass = Class.forName(depositTypeStr);
                 DepositType depositType = (DepositType) aClass.newInstance();
@@ -64,12 +62,14 @@ public class InputReader {
                 //save values in objects
                 listOfDeposits.add(deposit);
             }
+
             Collections.sort(listOfDeposits);
             RandomAccessFile randomAccessFile = new RandomAccessFile("source/outPut.txt", "rw");
             for (Deposit depositSorted : listOfDeposits) {
                 //System.out.println(depositSorted.getInterest());
                 randomAccessFile.writeUTF(depositSorted.getCustomerNumber() + "#" + depositSorted.getInterest()+ System.lineSeparator() );
             }
+            randomAccessFile.close();
 
         } catch (SAXException e) {
             e.printStackTrace();
@@ -84,8 +84,6 @@ public class InputReader {
 
         } catch (ClassNotFoundException e) {
             System.out.println(" سپرده وارد شده صحیح نمی باشد");
-            e.printStackTrace();
-
         }
 
 
