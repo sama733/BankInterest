@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class InputReader {
+public class InputParser {
 
     public static void main(String[] args) {
-        InputReader readInput = new InputReader();
+        InputParser readInput = new InputParser();
         readInput.run();
     }
 
