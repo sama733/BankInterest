@@ -1,10 +1,7 @@
-
-
-
 import java.math.BigDecimal;
 
 
-public class Deposit  implements Comparable<Deposit> {
+public class Deposit implements Comparable<Deposit> {
 
     private int customerNumber;
     private BigDecimal depositBalance;
@@ -35,12 +32,6 @@ public class Deposit  implements Comparable<Deposit> {
     }
 
     public void setDepositBalance(BigDecimal depositBalance) {
-        try { if(depositBalance.compareTo(BigDecimal.ZERO)<0 )
-
-                throw new Exception("not valid input");
-            } catch (Exception e) {
-                System.out.println(" مقدار موجودی وارد شده صحیح نمی باشد");
-            }
 
         this.depositBalance = depositBalance;
     }
@@ -50,11 +41,6 @@ public class Deposit  implements Comparable<Deposit> {
     }
 
     public void setDurationInDays(int durationInDays) {
-        try { if(durationInDays <= 0)
-                throw new Exception("not valid input");
-            } catch (Exception e) {
-                System.out.println(" تعداد روزهای وارد شده صحیح نمی باشد");
-            }
         this.durationInDays = durationInDays;
     }
 
@@ -70,15 +56,6 @@ public class Deposit  implements Comparable<Deposit> {
 
     @Override
     public int compareTo(Deposit deposit) {
-        return -1* this.getInterest().compareTo(deposit.getInterest());
-
-        /*public int compareTo(Deposit deposit) {
-        * if(this.getInterest()> deposit.getInterested())
-        * return 1;
-        * else if (this.getInterest() < deposit.getInterest())
-        *return -1;
-        * else
-        * return 0;
-        * */
+        return deposit.getInterest().compareTo(interest);
     }
 }

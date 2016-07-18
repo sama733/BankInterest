@@ -1,3 +1,5 @@
+import exceptionHandling.DepositBalanceNotValidException;
+import exceptionHandling.DurationInDaysNotValidException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,16 +18,15 @@ import java.util.Collections;
 
 public class InputParser {
 
+
     public static void main(String[] args) {
-        InputParser readInput = new InputParser();
-        readInput.run();
+        run();
     }
 
-    public void run() {
+    public static void run() {
 
         ArrayList<Deposit> listOfDeposits = new ArrayList<Deposit>();
         try {
-
             //read xml file
             File xmlFile = new File("depositList.xml");
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -36,59 +37,71 @@ public class InputParser {
             //iterate file
             NodeList list = document.getElementsByTagName("deposit");
             for (int i = 0; i < list.getLength(); i++) {
-                Node node = list.item(i);
-                Element element = null;
-                Deposit deposit = new Deposit();
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    element = (Element) node;
-                    deposit.setCustomerNumber(Integer.parseInt(element.getElementsByTagName("customerNumber").item(0).getTextContent()));
-                    deposit.setDepositBalance(BigDecimal.valueOf(Long.parseLong(element.getElementsByTagName("depositBalance").item(0).getTextContent())));
-                    deposit.setDurationInDays(Integer.valueOf(element.getElementsByTagName("durationInDays").item(0).getTextContent()));
+                Deposit deposit = null;
+                try {
+                    Node node = list.item(i);
+
+                    Element element = null;
+                    deposit = new Deposit();
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        element = (Element) node;
+                        deposit.setCustomerNumber(Integer.parseInt(element.getElementsByTagName("customerNumber").item(0).getTextContent()));
+                        deposit.setDepositBalance(BigDecimal.valueOf(Long.parseLong(element.getElementsByTagName("depositBalance").item(0).getTextContent())));
+                        if (deposit.getDepositBalance().compareTo(BigDecimal.ZERO) <= 0) {
+                            throw new DepositBalanceNotValidException("موجودی صحیح نیست");
+                        }
+                        deposit.setDurationInDays(Integer.valueOf(element.getElementsByTagName("durationInDays").item(0).getTextContent()));
+                        if (deposit.getDurationInDays() <= 0) {
+                            throw new DurationInDaysNotValidException("بازه زمانی اشتباه است");
+                        }
+                    }
+
+
+                    //reflection code -> khandane depositType va sakhtane kelase morede nazar
+                    String depositTypeStr = element.getElementsByTagName("depositType").item(0).getTextContent();
+                    Class typeOfDeposit = Class.forName(depositTypeStr);
+                    DepositType depositType = (DepositType) typeOfDeposit.newInstance();
+                    deposit.setDepositType(depositType);
+
+                    //  mohasebe sode seporde
+                    BigDecimal Days = new BigDecimal("36500");
+                    BigDecimal interestOfDeposit = (deposit.getDepositBalance().multiply(new BigDecimal(deposit.getDurationInDays())))
+                            .multiply(new BigDecimal(depositType.getInterestRate()))
+                            .divide(Days, 3, BigDecimal.ROUND_DOWN);
+                    deposit.setInterest(interestOfDeposit);
+
+                    //save values in objects
+                    listOfDeposits.add(deposit);
+                } catch (ClassNotFoundException e) {
+                    continue;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (DepositBalanceNotValidException e) {
+                    continue;
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (DurationInDaysNotValidException e) {
+                    continue;
                 }
 
-                //reflection code -> khandane depositType va sakhtane kelase morede nazar
-                String depositTypeStr = element.getElementsByTagName("depositType").item(0).getTextContent();
-                Class aClass = Class.forName(depositTypeStr);
-                DepositType depositType = (DepositType) aClass.newInstance();
-                deposit.setDepositType(depositType);
 
-                //  mohasebe sode seporde
-                BigDecimal Days = new BigDecimal("36500");
-                BigDecimal interestOfDeposit = (deposit.getDepositBalance().multiply(new BigDecimal(deposit.getDurationInDays())))
-                        .multiply(new BigDecimal(depositType.getInterestRate()))
-                        .divide(Days, 3, BigDecimal.ROUND_DOWN);
-                deposit.setInterest(interestOfDeposit);
-
-                //save values in objects
-                listOfDeposits.add(deposit);
             }
 
             Collections.sort(listOfDeposits);
-            RandomAccessFile randomAccessFile = new RandomAccessFile("source/outPut.txt", "rw");
+            RandomAccessFile outputFile = new RandomAccessFile("source/outPut.txt", "rw");
             for (Deposit depositSorted : listOfDeposits) {
                 //System.out.println(depositSorted.getInterest());
-                randomAccessFile.writeUTF(depositSorted.getCustomerNumber() + "#" + depositSorted.getInterest()+ System.lineSeparator() );
+                outputFile.writeBytes(depositSorted.getCustomerNumber() + "#" + depositSorted.getInterest() + "\n");
             }
-            randomAccessFile.close();
-
+            outputFile.close();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-
-        } catch (ClassNotFoundException e) {
-            System.out.println(" سپرده وارد شده صحیح نمی باشد");
         }
-
-
     }
-
 }
 
 
